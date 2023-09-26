@@ -60,7 +60,7 @@ class Application:
             raise SystemExit
 
         if not self.__human:
-            path, statesExplored = search(self.maze, searchMethod)
+            path, statesExplored = search(self.maze, searchMethod) # call the search func.
         else:
             path, statesExplored = [], 0
 

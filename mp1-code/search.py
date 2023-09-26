@@ -32,9 +32,50 @@ def search(maze, searchMethod):
 
 
 def bfs(maze):
-    # TODO: Write your code here
-    # return path, num_states_explored
-    return [], 0
+    # 广度优先搜索算法
+    # This bfs func is implemented by Leixin Chang
+
+    # 创建所需要的储存空间
+    frontier_queue = [] # 搜索list
+    explored = {} # 检索过的点
+    parent = {} # 通过父子对节点记录路径序列
+    num_explored = 0
+    goal = None
+    final_path = [] # 储存总目标按照 parent 追踪回来的路径
+
+    # 初始化
+    current_point = maze.getStart() # 读取起点
+    frontier_queue.append(current_point) # 将起点加入当前搜索序列
+    parent[current_point] = None
+    explored[current_point] = True
+
+    # 搜索
+    while frontier_queue:  # 当搜索序列为空时 结束循环
+        current_point = frontier_queue.pop(0) # 拿出序列第一个，并将其从搜索序列汇总删除掉
+        current_neighbors = maze.getNeighbors(current_point[0],current_point[1]) # 获取当前点的相邻点（小于等于4）
+
+        # 遍历邻近点
+        for neighbor in current_neighbors:
+            # 判断该点是否 explored
+            if neighbor not in explored:
+                frontier_queue.append(neighbor)
+                explored[neighbor] = True # 将该点标记为 explored
+                parent[neighbor] = current_point # 标记该点的父子对
+                num_explored += 1
+
+                if maze.isObjective(neighbor[0],neighbor[1]): # 检查是否为目标点
+                    goal = neighbor
+                    break
+
+    child = goal
+    while parent[child] is not None:
+        final_path.append(child) # 从 goal 往 start 追踪，但是goal的索引在前，start 在后， 后续可以反转。
+        child = parent[child]
+
+    final_path.append(maze.getStart()) # 手动添加起点
+    final_path.reverse() # 将goal在前，start在后的情况反转一下
+
+    return final_path, num_explored
 
 
 def dfs(maze):
