@@ -37,36 +37,41 @@ def bfs(maze):
 
     # 创建所需要的储存空间
     frontier_queue = [] # 搜索list
-    explored = {} # 检索过的点
+    # explored = {} # 检索过的点
+    explored = [] # 储存探索过的点
     parent = {} # 通过父子对节点记录路径序列
     num_explored = 0
     goal = None
     final_path = [] # 储存总目标按照 parent 追踪回来的路径
+    explored_filtered = [] # 储存 final_path 以外的 探索过的点
 
     # 初始化
     current_point = maze.getStart() # 读取起点
     frontier_queue.append(current_point) # 将起点加入当前搜索序列
     parent[current_point] = None
-    explored[current_point] = True
+    explored.append(current_point) # 将当前点（起点）加入已被探索点集合
 
     # 搜索
     while frontier_queue:  # 当搜索序列为空时 结束循环
         current_point = frontier_queue.pop(0) # 拿出序列第一个，并将其从搜索序列汇总删除掉
+                                              # 先进先出保证了"一层一层搜索"，从而保证了最优性
         current_neighbors = maze.getNeighbors(current_point[0],current_point[1]) # 获取当前点的相邻点（小于等于4）
 
         # 遍历邻近点
         for neighbor in current_neighbors:
-            # 判断该点是否 explored
-            if neighbor not in explored:
+            if neighbor not in explored: # 如果该点未被搜索过
                 frontier_queue.append(neighbor)
-                explored[neighbor] = True # 将该点标记为 explored
+                # explored[neighbor] = True # 将该点标记为 explored
+                explored.append(neighbor)
                 parent[neighbor] = current_point # 标记该点的父子对
                 num_explored += 1
+
 
                 if maze.isObjective(neighbor[0],neighbor[1]): # 检查是否为目标点
                     goal = neighbor
                     break
 
+    # 从终点开始回溯
     child = goal
     while parent[child] is not None:
         final_path.append(child) # 从 goal 往 start 追踪，但是goal的索引在前，start 在后， 后续可以反转。
@@ -75,7 +80,19 @@ def bfs(maze):
     final_path.append(maze.getStart()) # 手动添加起点
     final_path.reverse() # 将goal在前，start在后的情况反转一下
 
+    # 提取出遍历过的点，对于用字典储存点来说
+    # for key in explored:
+    #     if explored[key]:
+    #         if key not in final_path: # 排除掉在 final_path中的点
+    #             explored_points.append(key)
+    for i in range(len(explored)):
+        # print(explored[i])
+        if explored[i] not in final_path:
+            explored_filtered.append(explored[i])
+
+    # print(explored)
     return final_path, num_explored
+    # return final_path, num_explored, explored_filtered
 
 
 def dfs(maze):
