@@ -30,9 +30,12 @@ def search(maze, searchMethod):
         "dfs": dfs,
         "greedy": greedy,
         "astar": astar,
+        "astar_mul": astar_mul # For execution of multi-dot A*
     }.get(searchMethod)(maze)
 
-
+#############################
+## BFS Search by Leixin Chang
+#############################
 def bfs(maze):
     # 广度优先搜索算法
     # This bfs func is implemented by Leixin Chang
@@ -95,27 +98,161 @@ def bfs(maze):
     return path, num_explored
     # return path, num_explored, explored_filtered
 
-
+###########################
+## DFS Search by Chuhan Sun
+###########################
 def dfs(maze):
     # TODO: Write your code here
     # return path, num_states_explored
-    return [], 0
+    explored = list()
+    start=maze.getStart()
+    frontier = [(start, [start])]  # 使用栈来实现深度优先搜索
+    while frontier:
+        curr, path = frontier.pop()
+        if maze.isObjective(curr[0], curr[1]):
+            return path, len(explored)
+        current_neighbors = maze.getNeighbors(curr[0], curr[1])
+        for neighbor in current_neighbors:
+            if neighbor not in explored:
+                explored.append(neighbor)
+                frontier.append((neighbor, path + [neighbor]))
+    return [],0
 
-
+#############################
+## Greedy Search by Wentao Ni
+#############################
 def greedy(maze):
     # TODO: Write your code here
-    # return path, num_states_explored
-    return [], 0
+    path = []
+    explored = []
+    record_last_step = {}
+    num_states_explored = 0
+    step = 0
+    obj = maze.getObjectives()[0]
+    coord = maze.getStart()
+    num_states_explored += 1
+    explored.append(coord)
+    while explored != []:
+        choice = maze.getNeighbors(coord[0],coord[1])
+        #遇到死路或鬼打墙，回溯至上一个有未探索路径的节点
+        if isAllExplored(choice,explored):
+            for i in range(0,num_states_explored-1):
+                checkpoint = explored[-i]
+                check = maze.getNeighbors(checkpoint[0],checkpoint[1])
+                if not isAllExplored(check,explored):
+                    coord = checkpoint
+                    choice = check
+                    explored.append(coord)
+                    break
+        move = select(choice,obj,explored)
+        num_states_explored += 1
+        coord = move
+        explored.append(move)
+        if maze.isObjective(move[0],move[1]):
+            break
+    #生成path
+    for j in explored:
+        if not j in record_last_step:
+            step += 1
+            path.append(j)
+            record_last_step[j] = step
+        #原路返回时，筛除重复路径
+        else:
+            step = record_last_step[j]
+            del path[step:]
+    return path, num_states_explored
+
+def heuristic(item,obj):
+    # Manhattan Distance
+    d = abs(obj[0]-item[0])+abs(obj[1]-item[1])
+    # Euclidean DIstance
+    # d = math.sqrt(1.0*((obj[0]-item[0])**2+(obj[1]-item[1])**2))
+    return d
+
+def select(choice,obj,explored):
+    min_value = sys.maxsize
+    min_move = None
+    for i in choice:
+        v = heuristic(i,obj)
+        if i in explored:
+            v += 3
+        if v < min_value:
+            min_value = v
+            min_move = i
+    return min_move
+
+def isAllExplored(choice,explored):
+    flag = True
+    for i in choice:
+        if i not in explored:
+            flag = False
+    return flag
 
 
-# def astar(maze):
-#     # TODO: Write your code here
-#     # return path, num_states_explored
-#     return [], 0
+#######################################
+## A* Single-dot Search by Leixin Chang
+#######################################
 
+def astar(maze): # The single-dot A* implemented by Leixin.
+    # initialization
+    frontier = []  # open_list
+    explored = []  # closed_list
+    path = []  # 最终路径
+    parent = {}  # 记录父子节点关系
+    evaluation = {}  # evaluation function
+    cost = {}  # 记录每个点的cost 点:cost_value
 
-# # 以下的代码是 part 2 multi_dots searching with A*
+    start_point = maze.getStart()  # 获取起点
+    goal_points = maze.getObjectives()
+    goal_point = goal_points[0]
 
+    cost[start_point] = 0  # 设置起点的点cost 为0 （优先级最高）
+    evaluation[start_point] = 0  # 设置优先级为0
+    parent[start_point] = None  # 设置起点没有父点
+    frontier.append(start_point)
+
+    current_point = None
+    num_explored = 0  # 搜索次数计数器
+
+    while frontier:
+        evaluation_mini = sys.maxsize
+        # 找出 frontier 中优先级最高的点，并赋给current_point
+        for point in frontier:
+            if evaluation[point] < evaluation_mini:
+                evaluation_mini = evaluation[point]
+                current_point = point
+
+        # 如果当前点是终点
+        if current_point[0] == goal_point[0] and \
+                current_point[1] == goal_point[1]:
+            # 回溯路径
+            child = current_point
+            while parent[child] is not None:
+                path.append(child)  # 从 goal 往 start 追踪，但是goal的索引在前，start 在后， 后续可以反转。
+                child = parent[child]
+
+            path.append(maze.getStart())  # 手动添加起点
+            path.reverse()  # 将goal在前，start在后的情况反转一下
+            return path, num_explored  # return放在程序出口
+
+        # 如果当前点不是终点
+        else:
+            frontier.remove(current_point)  # 如果该点不是终点， 从 frontier 去掉这个点
+            explored.append(current_point)  # 将该点加入 explored
+
+            current_neighbors = maze.getNeighbors(current_point[0], current_point[1])  # 获取当前点的相邻点
+            for neighbor in current_neighbors:  # 遍历相邻点
+                if neighbor in explored:
+                    continue
+                if neighbor not in frontier:
+                    num_explored += 1
+                    parent[neighbor] = current_point
+                    cost[neighbor] = cost[current_point] + \
+                                     abs(neighbor[0] - current_point[0]) + \
+                                     abs(neighbor[1] - current_point[1])
+                    evaluation[neighbor] = cost[neighbor] + \
+                                           heuristic_calc_manhattan(neighbor, goal_point) # 使用曼哈顿距离的启发函数
+                    frontier.append(neighbor)
 
 # 计算当前阶段的启发函数 f(n) = g(n) + h(n) (对角距离)
 def heuristic_calc_manhattan(current_point, current_goal):
@@ -126,154 +263,13 @@ def heuristic_calc_manhattan(current_point, current_goal):
     return h
 
 
-# # 计算cost g(n)
-# def cost_calc(curent_point, parent_point):
-#     return 0
+######################################
+## A* Multi-dot Search by Leixin Chang
+######################################
 
-
-
-
-
-# A* 单点
-# def astar(maze):
-#     # initialization
-#     frontier = []  # open_list
-#     explored = []  # closed_list
-#     path = []  # 最终路径
-#     parent = {}  # 记录父子节点关系
-#     evaluation = {}  # evaluation function
-#     cost = {}  # 记录每个点的cost 点:cost_value
-#
-#     start_point = maze.getStart()  # 获取起点
-#     goal_points = maze.getObjectives()
-#     goal_point = goal_points[0]
-#
-#     cost[start_point] = 0  # 设置起点的点cost 为0 （优先级最高）
-#     evaluation[start_point] = 0  # 设置优先级为0
-#     parent[start_point] = None  # 设置起点没有父点
-#     frontier.append(start_point)
-#
-#     current_point = None
-#     num_explored = 0  # 搜索次数计数器
-#
-#     while frontier:
-#         evaluation_mini = sys.maxsize
-#         # 找出 frontier 中优先级最高的点，并赋给current_point
-#         for point in frontier:
-#             if evaluation[point] < evaluation_mini:
-#                 evaluation_mini = evaluation[point]
-#                 current_point = point
-#
-#         # 如果当前点是终点
-#         if current_point[0] == goal_point[0] and \
-#                 current_point[1] == goal_point[1]:
-#             # 回溯路径
-#             child = current_point
-#             while parent[child] is not None:
-#                 path.append(child)  # 从 goal 往 start 追踪，但是goal的索引在前，start 在后， 后续可以反转。
-#                 child = parent[child]
-#
-#             path.append(maze.getStart())  # 手动添加起点
-#             path.reverse()  # 将goal在前，start在后的情况反转一下
-#             return path, num_explored  # return放在程序出口
-#
-#         # 如果当前点不是终点
-#         else:
-#             frontier.remove(current_point)  # 如果该点不是终点， 从 frontier 去掉这个点
-#             explored.append(current_point)  # 将该点加入 explored
-#
-#             current_neighbors = maze.getNeighbors(current_point[0], current_point[1])  # 获取当前点的相邻点
-#             for neighbor in current_neighbors:  # 遍历相邻点
-#                 if neighbor in explored:
-#                     continue
-#                 if neighbor not in frontier:
-#                     num_explored += 1
-#                     parent[neighbor] = current_point
-#                     cost[neighbor] = cost[current_point] + \
-#                                      abs(neighbor[0] - current_point[0]) + \
-#                                      abs(neighbor[1] - current_point[1])
-#                     evaluation[neighbor] = cost[neighbor] + \
-#                                            heuristic_calc(neighbor, goal_point)
-#                     frontier.append(neighbor)
-
-
-# A* 多点(错误的)
-# def astar(maze):
-#     # initialization
-#     frontier = []  # open_list
-#     explored = []  # closed_list
-#     path = []  # 最终路径
-#     parent = {}  # 记录父子节点关系
-#     evaluation = {}  # evaluation function
-#     cost = {}  # 记录每个点的cost 点:cost_value
-#
-#     start_point = maze.getStart()  # 获取起点
-#     goal_points = maze.getObjectives()
-#     goal_point = get_closest_goal(start_point, goal_points)  # 选取距离当前点最近的点，弊端是heuristic会穿墙
-#     goal_points.remove(goal_point)  # 将选出的点从 goal_points 中去掉
-#
-#     cost[start_point] = 0  # 设置起点的点cost 为0 （优先级最高）
-#     evaluation[start_point] = 0  # 设置优先级为0
-#     parent[start_point] = None  # 设置起点没有父点
-#     frontier.append(start_point)
-#
-#     current_point = None
-#     num_explored = 0  # 搜索次数计数器
-#
-#     while frontier:
-#         evaluation_mini = sys.maxsize
-#         # 找出 frontier 中优先级最高的点，并赋给current_point
-#         for point in frontier:
-#             if evaluation[point] < evaluation_mini:
-#                 evaluation_mini = evaluation[point]
-#                 current_point = point
-#             if current_point in goal_points:  # 如果当前点是目标序列里未被取出的点
-#                 goal_points.remove(current_point)
-#
-#         # 如果当前点是选取的终点
-#         if current_point[0] == goal_point[0] and \
-#                 current_point[1] == goal_point[1]:
-#             if goal_points:     # 如果目标点列表不为空
-#                 goal_point = get_closest_goal(current_point, goal_points)  # 选取距离当前点最近的点，弊端是heuristic会穿墙
-#                 goal_points.remove(goal_point)  # 将选出的点从goal_points 中去掉
-#             else:  # 如果所有目标都被探索过，即目标列表为空
-#                 # 回溯路径
-#                 child = current_point
-#                 while parent[child] is not None:
-#                     path.append(child)  # 从 goal 往 start 追踪，但是goal的索引在前，start 在后， 后续可以反转。
-#                     child = parent[child]
-#                 path.append(maze.getStart())  # 手动添加起点
-#                 path.reverse()  # 将goal在前，start在后的情况反转一下
-#                 return path, num_explored  # return放在程序出口
-#
-#         # 如果当前点不是终点
-#         else:
-#             frontier.remove(current_point)  # 如果该点不是终点， 从 frontier 去掉这个点
-#             explored.append(current_point)  # 将该点加入 explored
-#
-#             current_neighbors = maze.getNeighbors(current_point[0], current_point[1])  # 获取当前点的相邻点
-#             for neighbor in current_neighbors:  # 遍历相邻点
-#                 if neighbor in explored:
-#                     continue
-#                 if neighbor not in frontier:
-#                     num_explored += 1
-#                     parent[neighbor] = current_point
-#                     cost[neighbor] = cost[current_point] + \
-#                                      abs(neighbor[0] - current_point[0]) + \
-#                                      abs(neighbor[1] - current_point[1])
-#                     evaluation[neighbor] = cost[neighbor] + \
-#                                            heuristic_calc(neighbor, goal_point)
-#                     frontier.append(neighbor)
-
-# 现在这个做法是一次性找到了每个点到起点的最短路径，并不符合题目要求
-
-
-
-# 多点 A*
-def astar(maze): # 多点的第二次尝试
+def astar_mul(maze): # The multi-dot A* search implemented by Leixin.
 
     start_point = maze.getStart()
-    print(start_point)
     goal_points = maze.getObjectives()
     path_total = []
     num_explored_total = 0
@@ -284,18 +280,14 @@ def astar(maze): # 多点的第二次尝试
         path, num_explored = astar_single(maze, start_point, goal_point)
         start_point = goal_point # 将上次的goal_point 变换为star_point
         goal_points.remove(goal_point)
-        # for path_element in path:
-        #     for future_goal in goal_points:
-        #         if path_element[0] == future_goal[0] and path_element[0] == future_goal[0]:
-        #             goal_points.remove(future_goal)
 
         path_total += path
-        path_total.insert(0,maze.getStart())
+        path_total.insert(0, maze.getStart())
         num_explored_total += num_explored
 
     return path_total, num_explored_total
 
-# 单点 A*
+# A* Single-dot Search with Diagonal Distance
 def astar_single(maze,start_point,goal_point):
     # initialization
     frontier = []  # open_list
@@ -357,7 +349,7 @@ def astar_single(maze,start_point,goal_point):
                                            heuristic_calc_diagonal(neighbor, goal_point)
                     frontier.append(neighbor)
 
-# 找到目标序列里最近的目标点
+# Find the closest goal of the goal list
 def get_closest_goal(current_point, goals):
     closest_goal = None
     closest_dis = sys.maxsize
@@ -371,7 +363,7 @@ def get_closest_goal(current_point, goals):
 
     return closest_goal  # 将最近目标返回
 
-# 多点中用于基于对角距离设计的启发函数
+# Heuristics Based on Diagonal Distance
 def heuristic_calc_diagonal(current_point, current_goal):
     weight = 4.5  # 启发h(n)的权重,经过测试，发现权重在4.5 时候 state explored 最少
     dx = abs(current_point[0] - current_goal[0])
