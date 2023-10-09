@@ -256,7 +256,7 @@ def astar(maze): # The single-dot A* implemented by Leixin.
 
 # 计算当前阶段的启发函数 f(n) = g(n) + h(n) (对角距离)
 def heuristic_calc_manhattan(current_point, current_goal):
-    weight = 4.5  # 启发h(n)的权重,经过测试，发现权重在4.5 时候 state explored 最少
+    weight = 1
     dx = abs(current_point[0] - current_goal[0])
     dy = abs(current_point[1] - current_goal[1])
     h = weight * (dx + dy)  # 使用对角距离，并且添加权重
@@ -365,7 +365,7 @@ def get_closest_goal(current_point, goals):
 
 # Heuristics Based on Diagonal Distance
 def heuristic_calc_diagonal(current_point, current_goal):
-    weight = 4.5  # 启发h(n)的权重,经过测试，发现权重在4.5 时候 state explored 最少
+    weight = 1 # 启发h(n)的权重,经过测试，发现权重在4.5 时候 state explored 最少, 但是不符合admissible 的原则
     dx = abs(current_point[0] - current_goal[0])
     dy = abs(current_point[1] - current_goal[1])
     h = weight * (1.414 * min(dx, dy) + abs(dx - dy))  # 使用对角距离，并且添加权重
