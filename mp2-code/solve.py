@@ -55,14 +55,14 @@ def solve(board, pents):
         for coord in coords:
             piece[coord[0] - min_x][coord[1] - min_y] = plabel
         solution.append((piece.astype(int), (min_x, min_y)))
-        
+
     return solution
 
 
 def recursive_dfs(board, pents_dict):
     # recursively call the function to find the solution with depth first search
     if not pents_dict:  # if all the pents are placed, return the result
-        return True, board
+        return True, board  # return True and the result board, which means "found"
 
     board_shape = board.shape
 
