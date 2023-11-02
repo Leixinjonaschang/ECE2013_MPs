@@ -19,8 +19,7 @@ def solve(board, pents):
     -You may assume there will always be a solution.
     """
     board = np.array(board)
-
-    # change the board a litte to be compatible with the pents
+    # change the board for better processing
     board[board == 0] = -1
     board[board == 1] = 0
 
@@ -79,7 +78,7 @@ def recursive_dfs(board, pents_dict):
                         if not in_bound_test(board_shape, x + x_move, y + y_move) or board[x + x_move][y + y_move] != 0:
                             # if the pent is out of bound or overlaps with other pents, try the next variant
                             to_continue = True
-                            break  # break the loop if we cannot add a new pent
+                            break  # break if we cannot add a new pent
                     # continue to the next loop if we cannot add a new pent
                     if to_continue:
                         continue
@@ -94,7 +93,7 @@ def recursive_dfs(board, pents_dict):
                     for x_move, y_move in variant:
                         new_board[x + x_move][y + y_move] = p
 
-                    # recursively call the function to find the solution
+                    # recursively running
                     found, res_board = recursive_dfs(new_board, new_pents_map)
 
                     if found:
@@ -144,7 +143,6 @@ def reformulate_variant(variant):
 
 
 def label_pent(pent):
-    # label the pentomino
     for i in range(pent.shape[0]):
         for j in range(pent.shape[1]):
             if pent[i][j] != 0:
