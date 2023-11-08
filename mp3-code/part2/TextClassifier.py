@@ -11,6 +11,7 @@
 You should only modify code within this file -- the unrevised staff files will be used for all other
 files and classes when code is run, so be careful to not modify anything else.
 """
+import math
 
 
 class TextClassifier(object):
@@ -22,6 +23,13 @@ class TextClassifier(object):
         """
         self.lambda_mixture = 0.0
 
+        # 初始化数据结构来存储概率
+        self.class_word_counts = {}  # key是类别，value是该类别的单词数
+        self.class_counts = {}  # key是类别，value是该类别的文档数
+        self.class_priors = {}  # key是类别，value是该类别的先验概率
+        self.vocab = set()  # 词汇表
+        self.word_probabilities = {}  # key是类别，value是该类别下每个单词的概率
+
     def fit(self, train_set, train_label):
         """
         :param train_set - List of list of words corresponding with each text
@@ -32,13 +40,6 @@ class TextClassifier(object):
             example: Suppose I had two texts, first one was class 0 and second one was class 1.
             Then train_labels := [0,1]
         """
-
-        # 初始化数据结构来存储概率
-        self.class_word_counts = {}  # key是类别，value是该类别的单词数
-        self.class_counts = {}  # key是类别，value是该类别的文档数
-        self.class_priors = {}  # key是类别，value是该类别的先验概率
-        self.vocab = set()  # 词汇表
-        self.word_probabilities = {}  # key是类别，value是该类别下每个单词的概率
 
         # 计算每个类别的文档数目
         for label in train_label:  # 遍历每个类别
@@ -91,7 +92,36 @@ class TextClassifier(object):
         accuracy = 0.0
         result = []
 
-        # TODO: Write your code here
-        pass
+        correct_predictions = 0
+        for doc in x_set:
+            # 计算每个类别的概率
+            class_probabilities = self.calc_doc_probabilities(doc)
 
+            # 计算预测概率最高的类别
+            predicted_class = max(class_probabilities, key=class_probabilities.get)
+            result.append(predicted_class)
+
+            # 计算准确率
+            correct_predictions += 1 if predicted_class == dev_label[x_set.index(doc)] else 0
+
+        accuracy += correct_predictions / len(x_set)
         return accuracy, result
+
+    def calc_doc_probabilities(self, doc):
+        """
+        :param text: list of words in a text
+        :return: dictionary of probabilities for each class
+        """
+        class_probabilities = {}
+
+        for class_label in self.word_probabilities:
+            class_probabilities[class_label] = self.class_priors[class_label]
+
+            for word in doc:
+                if word in self.vocab:
+                    class_probabilities[class_label] *= self.word_probabilities[class_label].get(word, 1.0 / (
+                            sum(self.class_word_counts[class_label].values()) + len(self.vocab)))
+
+            class_probabilities[class_label] = math.log(class_probabilities[class_label])
+
+        return class_probabilities
