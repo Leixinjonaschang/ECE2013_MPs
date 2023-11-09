@@ -1,0 +1,4 @@
+Top 10 & family& species& found& genus& moth& gastropod& sea& known& marine& described& \\
+& 0.010139& 0.008811& 0.00516& 0.004979& 0.002987& 0.001901& 0.001841& 0.00178& 0.00166& 0.001629& \\
+Bottom 10 & tropical& snail& mollusk& endemic& subtropical& habitat& natural& forests& snails& moist& \\
+& 0.001539& 0.001418& 0.001388& 0.001358& 0.001267& 0.001207& 0.001086& 0.001086& 0.001026& 0.000996& \\

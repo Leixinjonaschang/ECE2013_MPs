@@ -1,0 +1,4 @@
+Top 10 & company& based& business& founded& records& bergen& record& services& systems& office& \\
+& 0.001115& 0.000423& 0.000385& 0.000346& 0.000308& 0.000308& 0.000308& 0.000269& 0.000269& 0.000231& \\
+Bottom 10 & products& established& including& norwegian& virgin& toronto& health& management& buses& capel& \\
+& 0.000231& 0.000192& 0.000192& 0.000192& 0.000192& 0.000192& 0.000192& 0.000192& 0.000192& 0.000192& \\

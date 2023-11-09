@@ -1,0 +1,4 @@
+Top 10 & album& released& band& records& first& studio& american& songs& music& second& \\
+& 0.023188& 0.013142& 0.004291& 0.004243& 0.003682& 0.003535& 0.002633& 0.002511& 0.002487& 0.002438& \\
+Bottom 10 & release& recorded& rock& debut& live& tracks& label& albums& new& ep& \\
+& 0.002365& 0.002243& 0.002194& 0.001975& 0.001975& 0.001902& 0.001829& 0.001756& 0.001707& 0.001609& \\

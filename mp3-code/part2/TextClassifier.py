@@ -24,13 +24,16 @@ class TextClassifier(object):
         """
         self.lambda_mixture = 0.0
 
-        # 初始化数据结构来存储概率
+        # 训练部分 初始化数据结构来存储概率
         self.class_word_counts = {}  # key是类别，value是该类别的单词数
         self.class_counts = {}  # key是类别，value是该类别的文档数
         self.class_priors = {}  # key是类别，value是该类别的先验概率
         self.vocab = set()  # 词汇表
         self.word_probabilities = {}  # key是类别，value是该类别下每个单词的概率
+
+        # 预测部分 初始化数据结构来存储预测结果
         self.pred_actual = []  # 元素为 tuple (predicted_label, actual_label)
+        self.test_class_counts = {}  # key是类别，value是该类别的文档数
 
     def fit(self, train_set, train_label):
         """
@@ -79,6 +82,17 @@ class TextClassifier(object):
                 count = word_counts.get(word, 0)  # 该类别下该单词的数目
                 self.word_probabilities[label][word] = (count + 1) / (total_words + vocab_size)
 
+        # 保存每个类别概率最大的前20个features
+        num_top_features = 20
+        top_feature_file_name = 'utils/top_20_features/top_features.txt'
+        for label in range(1, 15):
+            with open(top_feature_file_name, 'a') as top_feature_file:
+                top_feature_file.write('Class ' + str(label) + ':\n')
+                top_features = self.get_top_features(label, num_top_features)
+                for feature in top_features:
+                    top_feature_file.write(feature[0] + ' ' + str(feature[1]) + '\n')
+                top_feature_file.write('\n')
+
     def predict(self, x_set, dev_label, lambda_mix=0.0):
         """
         :param dev_set: List of list of words corresponding with each text in dev set that we are testing on
@@ -109,19 +123,34 @@ class TextClassifier(object):
             correct_predictions += 1 if predicted_class == dev_label[x_set.index(doc)] else 0
 
         accuracy += correct_predictions / len(x_set)
-        self.plot_confusion_matrix()
+        self.plot_confusion_matrix(dev_label)
 
         return accuracy, result
 
-    def calc_doc_probabilities(self, doc):
-        """
-        :param text: list of words in a text
-        :return: dictionary of probabilities for each class
-        """
+    # def calc_doc_probabilities(self, doc):  # with the class priors included in the calculation
+    #     """
+    #     :param text: list of words in a text
+    #     :return: dictionary of probabilities for each class
+    #     """
+    #     class_probabilities = {}
+    #
+    #     for class_label in self.word_probabilities:
+    #         class_probabilities[class_label] = self.class_priors[class_label]
+    #
+    #         for word in doc:
+    #             if word in self.vocab:
+    #                 class_probabilities[class_label] *= self.word_probabilities[class_label].get(word, 1.0 / (
+    #                         sum(self.class_word_counts[class_label].values()) + len(self.vocab)))
+    #
+    #         class_probabilities[class_label] = math.log(class_probabilities[class_label])
+    #
+    #     return class_probabilities
+
+    def calc_doc_probabilities(self, doc):  # without class priors included in the calculation
         class_probabilities = {}
 
         for class_label in self.word_probabilities:
-            class_probabilities[class_label] = self.class_priors[class_label]
+            class_probabilities[class_label] = 1
 
             for word in doc:
                 if word in self.vocab:
@@ -132,13 +161,25 @@ class TextClassifier(object):
 
         return class_probabilities
 
-    def plot_confusion_matrix(self):
+    def plot_confusion_matrix(self, dev_label):
         """
         :return: None, but saves a confusion matrix plot
         """
         confusion_mat = [[0 for _ in range(14)] for _ in range(14)]
         for pred_label, actual_label in self.pred_actual:
             confusion_mat[pred_label - 1][actual_label - 1] += 1
+
+        # 统计测试集中各类别的数量
+        for label in dev_label:  # 遍历每个类别
+            if label not in self.test_class_counts:  # 如果类别不在class_counts中
+                self.test_class_counts[label] = 0  # 初始化为0
+            self.test_class_counts[label] += 1
+
+        # 把预测成功次数转为百分比
+        for i in range(14):
+            for j in range(14):
+                confusion_mat[i][j] = confusion_mat[i][j] / self.test_class_counts[i + 1]
+
         plt.imshow(confusion_mat, cmap='plasma', interpolation='nearest')
         plt.xlabel('Predicted Class')
         plt.ylabel('Actual Class')
@@ -150,4 +191,13 @@ class TextClassifier(object):
         plt.colorbar()
         plt.gca().invert_yaxis()  # invert y axis
         plt.savefig('utils/confusion_matrix.png')
-        # plt.show()
+        plt.show()
+
+    def get_top_features(self, label, num_top_features):
+        # 找出每个类别下概率最大的前num_top_features个单词
+        top_features = []
+        for word in self.word_probabilities[label]:
+            top_features.append((word, self.word_probabilities[label][word]))
+        top_features.sort(key=lambda x: x[1], reverse=True)
+
+        return top_features[:num_top_features]

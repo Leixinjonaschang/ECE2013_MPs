@@ -1,0 +1,4 @@
+Top 10 & published& book& novel& first& journal& written& series& newspaper& american& story& \\
+& 0.007811& 0.006064& 0.005992& 0.004148& 0.003905& 0.003226& 0.00262& 0.001965& 0.001916& 0.001916& \\
+Bottom 10 & author& new& magazine& fiction& books& peerreviewed& also& science& publication& life& \\
+& 0.001649& 0.001455& 0.001334& 0.00131& 0.001286& 0.001237& 0.001189& 0.00114& 0.00114& 0.001092& \\

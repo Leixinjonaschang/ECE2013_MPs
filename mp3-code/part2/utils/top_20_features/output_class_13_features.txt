@@ -1,0 +1,4 @@
+Top 10 & film& directed& starring& american& stars& released& written& based& drama& comedy& \\
+& 0.022259& 0.009072& 0.003578& 0.003373& 0.002658& 0.002607& 0.002428& 0.002249& 0.002198& 0.002147& \\
+Bottom 10 & also& produced& films& first& silent& movie& roles& name& novel& documentary& \\
+& 0.002096& 0.002096& 0.001482& 0.001354& 0.001354& 0.001329& 0.001124& 0.001099& 0.001099& 0.001073& \\

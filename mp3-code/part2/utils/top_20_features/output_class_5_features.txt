@@ -1,0 +1,4 @@
+Top 10 & born& member& district& politician& state& senate& house& democratic& party& served& \\
+& 0.002623& 0.002448& 0.001784& 0.001749& 0.001224& 0.001154& 0.001154& 0.001154& 0.001119& 0.001084& \\
+Bottom 10 & former& county& since& representatives& republican& elected& united& american& national& representing& \\
+& 0.001049& 0.000944& 0.000909& 0.000874& 0.000769& 0.000734& 0.000734& 0.0007& 0.000665& 0.000665& \\

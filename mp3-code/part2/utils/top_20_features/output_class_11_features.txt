@@ -1,0 +1,4 @@
+Top 10 & species& family& plant& genus& native& endemic& flowering& known& found& common& \\
+& 0.011083& 0.007426& 0.006526& 0.006217& 0.003376& 0.003319& 0.003291& 0.003207& 0.002475& 0.002138& \\
+Bottom 10 & leaves& plants& habitat& tree& name& grows& orchid& south& bulbophyllum& perennial& \\
+& 0.001969& 0.001969& 0.001885& 0.001688& 0.001491& 0.001491& 0.001406& 0.001378& 0.001266& 0.00121& \\

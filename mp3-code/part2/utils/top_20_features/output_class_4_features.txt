@@ -1,0 +1,4 @@
+Top 10 & born& football& played& league& player& footballer& professional& plays& former& national& \\
+& 0.004321& 0.002731& 0.002454& 0.002247& 0.001279& 0.001279& 0.001279& 0.001279& 0.00121& 0.001106& \\
+Bottom 10 & american& also& hockey& currently& rugby& team& australian& november& world& new& \\
+& 0.001002& 0.000864& 0.000864& 0.000864& 0.00083& 0.000795& 0.00076& 0.000726& 0.000691& 0.000657& \\

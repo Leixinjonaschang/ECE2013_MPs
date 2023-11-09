@@ -1,0 +1,4 @@
+Top 10 & river& lake& mountain& located& south& km& north& county& near& tributary& \\
+& 0.007471& 0.004483& 0.002925& 0.002575& 0.002003& 0.001685& 0.001621& 0.001272& 0.00124& 0.001208& \\
+Bottom 10 & west& range& lies& creek& crater& east& state& ft& flows& pass& \\
+& 0.001176& 0.001176& 0.001144& 0.001113& 0.001081& 0.001081& 0.001049& 0.001049& 0.000986& 0.000954& \\

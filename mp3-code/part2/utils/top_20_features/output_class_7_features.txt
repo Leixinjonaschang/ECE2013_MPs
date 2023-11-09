@@ -1,0 +1,4 @@
+Top 10 & historic& house& built& located& church& building& national& register& places& listed& \\
+& 0.006216& 0.004828& 0.004626& 0.003758& 0.0037& 0.003411& 0.003382& 0.002804& 0.002515& 0.002024& \\
+Bottom 10 & county& street& united& known& museum& also& states& designed& hospital& added& \\
+& 0.001821& 0.001821& 0.001532& 0.001474& 0.001417& 0.001417& 0.001301& 0.001185& 0.001156& 0.001156& \\

@@ -1,0 +1,4 @@
+Top 10 & village& district& population& province& located& census& municipality& nepal& state& india& \\
+& 0.003663& 0.001297& 0.000916& 0.000878& 0.000839& 0.000801& 0.000649& 0.000649& 0.000572& 0.000572& \\
+Bottom 10 & county& people& km& within& 1991& 2010& southern& time& kerala& road& \\
+& 0.000496& 0.000458& 0.000458& 0.000382& 0.000343& 0.000343& 0.000305& 0.000305& 0.000305& 0.000305& \\

@@ -1,0 +1,4 @@
+Top 10 & navy& built& war& ship& uss& united& class& aircraft& world& states& \\
+& 0.004089& 0.00354& 0.002533& 0.002197& 0.001984& 0.001831& 0.0018& 0.0018& 0.00177& 0.001709& \\
+Bottom 10 & launched& service& first& designed& named& royal& commissioned& american& ii& us& \\
+& 0.001678& 0.001282& 0.001251& 0.001251& 0.001251& 0.00119& 0.001099& 0.001068& 0.001038& 0.000977& \\

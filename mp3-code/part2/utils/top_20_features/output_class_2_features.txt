@@ -1,0 +1,4 @@
+Top 10 & school& high& located& university& college& public& schools& students& education& county& \\
+& 0.008338& 0.00345& 0.001941& 0.001402& 0.00133& 0.001186& 0.001186& 0.000899& 0.000827& 0.000719& \\
+Bottom 10 & district& new& founded& one& established& united& part& city& independent& secondary& \\
+& 0.000719& 0.000575& 0.000575& 0.000575& 0.000539& 0.000539& 0.000539& 0.000539& 0.000539& 0.000503& \\
