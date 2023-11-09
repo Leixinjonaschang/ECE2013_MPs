@@ -12,6 +12,7 @@ You should only modify code within this file -- the unrevised staff files will b
 files and classes when code is run, so be careful to not modify anything else.
 """
 import math
+import matplotlib.pyplot as plt
 
 
 class TextClassifier(object):
@@ -29,6 +30,7 @@ class TextClassifier(object):
         self.class_priors = {}  # key是类别，value是该类别的先验概率
         self.vocab = set()  # 词汇表
         self.word_probabilities = {}  # key是类别，value是该类别下每个单词的概率
+        self.pred_actual = []  # 元素为 tuple (predicted_label, actual_label)
 
     def fit(self, train_set, train_label):
         """
@@ -101,10 +103,14 @@ class TextClassifier(object):
             predicted_class = max(class_probabilities, key=class_probabilities.get)
             result.append(predicted_class)
 
-            # 计算准确率
+            self.pred_actual.append((predicted_class, dev_label[x_set.index(doc)]))  # for confusion matrix making
+
+            # 统计预测正确的次数
             correct_predictions += 1 if predicted_class == dev_label[x_set.index(doc)] else 0
 
         accuracy += correct_predictions / len(x_set)
+        self.plot_confusion_matrix()
+
         return accuracy, result
 
     def calc_doc_probabilities(self, doc):
@@ -125,3 +131,23 @@ class TextClassifier(object):
             class_probabilities[class_label] = math.log(class_probabilities[class_label])
 
         return class_probabilities
+
+    def plot_confusion_matrix(self):
+        """
+        :return: None, but saves a confusion matrix plot
+        """
+        confusion_mat = [[0 for _ in range(14)] for _ in range(14)]
+        for pred_label, actual_label in self.pred_actual:
+            confusion_mat[pred_label - 1][actual_label - 1] += 1
+        plt.imshow(confusion_mat, cmap='plasma', interpolation='nearest')
+        plt.xlabel('Predicted Class')
+        plt.ylabel('Actual Class')
+        plt.title('Confusion Matrix')
+        plt.xticks([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13],
+                   ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14"])
+        plt.yticks([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13],
+                   ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14"])
+        plt.colorbar()
+        plt.gca().invert_yaxis()  # invert y axis
+        plt.savefig('utils/confusion_matrix.png')
+        # plt.show()
