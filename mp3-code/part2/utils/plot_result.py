@@ -29,19 +29,9 @@ print('diff_recall', diff_recall)
 print('diff_f1', diff_f1)
 
 # Plot
-
 x = []
 for i in range(14):
     x.append(i)
-
-# plt.plot(x, pre_no_priors, label='pre_no_priors')
-# plt.plot(x, pre, label='pre')
-#
-# plt.plot(x, recall_no_priors, label='recall_no_priors')
-# plt.plot(x, recall, label='recall')
-#
-# plt.plot(x, f1_no_priors, label='f1_no_priors')
-# plt.plot(x, f1, label='f1')
 width = 0.15
 
 for i in range(len(x)):
