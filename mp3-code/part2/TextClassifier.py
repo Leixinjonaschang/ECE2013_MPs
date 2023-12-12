@@ -47,39 +47,39 @@ class TextClassifier(object):
         """
 
         # 计算每个类别的文档数目
-        for label in train_label:  # 遍历每个类别
-            if label not in self.class_counts:  # 如果类别不在class_counts中
-                self.class_counts[label] = 0  # 初始化为0
+        for label in train_label:
+            if label not in self.class_counts:
+                self.class_counts[label] = 0
             self.class_counts[label] += 1
 
         # 计算每个类别的先验概率
-        total_docs = len(train_set)  # 训练集中文档总数
-        for label in self.class_counts:  # 遍历每个类别
+        total_docs = len(train_set)
+        for label in self.class_counts:
             # 该类别先验概率 = 改类别文档书 / 训练集中文档总数
             self.class_priors[label] = self.class_counts[label] / total_docs
 
         # 计算每个类别中的单词数目
         for text, label in zip(train_set, train_label):
-            if label not in self.class_word_counts:  # 如果类别不在class_word_counts中
-                self.class_word_counts[label] = {}  # 初始化为{}
+            if label not in self.class_word_counts:
+                self.class_word_counts[label] = {}
 
-            for word in text:  # 遍历每个单词
-                self.vocab.add(word)  # 将单词加入词汇表
+            for word in text:
+                self.vocab.add(word)
 
                 if word not in self.class_word_counts[label]:
-                    self.class_word_counts[label][word] = 0  # 初始化这个类别下这个单词的数目
+                    self.class_word_counts[label][word] = 0
 
-                self.class_word_counts[label][word] += 1  # 该类别下该单词数目加1
+                self.class_word_counts[label][word] += 1
 
         # 对每个类别下的单词概率进行拉普拉斯平滑处理
-        vocab_size = len(self.vocab)  # 词汇表大小
-        for label, word_counts in self.class_word_counts.items():  # label是类别，word_counts是该类别下的单词数目
-            self.word_probabilities[label] = {}  # 初始化该类别下的单词概率
-            total_words = sum(word_counts.values())  # 该类别下的单词总数
+        vocab_size = len(self.vocab)
+        for label, word_counts in self.class_word_counts.items():
+            self.word_probabilities[label] = {}
+            total_words = sum(word_counts.values())
 
             # 计算该类别下每个单词的概率（条件概率 p(word|label)）
-            for word in self.vocab:  # 遍历词汇表中的每个单词
-                count = word_counts.get(word, 0)  # 该类别下该单词的数目
+            for word in self.vocab:
+                count = word_counts.get(word, 0)
                 self.word_probabilities[label][word] = (count + 1) / (total_words + vocab_size)
 
         # 保存每个类别概率最大的前20个features
