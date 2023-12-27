@@ -7,12 +7,13 @@ from snake import SnakeEnv
 import utils
 import time
 
+
 class Application:
     def __init__(self, args):
         self.args = args
         self.env = SnakeEnv(args.snake_head_x, args.snake_head_y, args.food_x, args.food_y)
         self.agent = Agent(self.env.get_actions(), args.Ne, args.C, args.gamma)
-        
+
     def execute(self):
         if not self.args.human:
             if self.args.train_eps != 0:
@@ -43,15 +44,14 @@ class Application:
 
                 action = self.agent.act(state, points, dead)
 
-    
             points = self.env.get_points()
             self.points_results.append(points)
             if game % self.args.window == 0:
                 print(
-                    "Games:", len(self.points_results) - window, "-", len(self.points_results), 
-                    "Points (Average:", sum(self.points_results[-window:])/window,
+                    "Games:", len(self.points_results) - window, "-", len(self.points_results),
+                    "Points (Average:", sum(self.points_results[-window:]) / window,
                     "Max:", max(self.points_results[-window:]),
-                    "Min:", min(self.points_results[-window:]),")",
+                    "Min:", min(self.points_results[-window:]), ")",
                 )
             self.env.reset()
         print("Training takes", time.time() - start, "seconds")
@@ -77,7 +77,7 @@ class Application:
 
         print("Testing takes", time.time() - start, "seconds")
         print("Number of Games:", len(points_results))
-        print("Average Points:", sum(points_results)/len(points_results))
+        print("Average Points:", sum(points_results) / len(points_results))
         print("Max Points:", max(points_results))
         print("Min Points:", min(points_results))
 
@@ -94,7 +94,7 @@ class Application:
             action = self.agent.act(state, 0, dead)
             count = 0
             while not dead:
-                count +=1
+                count += 1
                 pygame.event.pump()
                 keys = pygame.key.get_pressed()
                 if keys[K_ESCAPE] or self.check_quit():
@@ -120,22 +120,22 @@ class Application:
                 break
             self.env.reset()
             points_results.append(points)
-            print("Game:", str(game)+"/"+str(self.args.show_eps), "Points:", points)
+            print("Game:", str(game) + "/" + str(self.args.show_eps), "Points:", points)
         if len(points_results) == 0:
             return
-        print("Average Points:", sum(points_results)/len(points_results))
+        print("Average Points:", sum(points_results) / len(points_results))
 
     def check_quit(self):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 return True
         return False
-                
-            
+
+
 def main():
     parser = argparse.ArgumentParser(description='CS440 MP4 Snake')
 
-    parser.add_argument('--human', default = False, action="store_true",
+    parser.add_argument('--human', default=False, action="store_true",
                         help='making the game human playable - default False')
 
     parser.add_argument('--model_name', dest="model_name", type=str, default="q_agent.npy",
@@ -174,10 +174,10 @@ def main():
     parser.add_argument('--food_y', dest="food_y", type=int, default=80,
                         help='initialized y position of food  - default 80')
 
-
     args = parser.parse_args()
     app = Application(args)
     app.execute()
+
 
 if __name__ == "__main__":
     main()
