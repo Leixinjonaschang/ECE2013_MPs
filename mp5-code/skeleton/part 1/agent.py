@@ -19,6 +19,12 @@ class Agent:
         self.last_action = None
         self.last_points = 0
 
+        self.R_plus = 1.0
+
+        # 使用探索函数 (True) 还是ε-贪婪策略随机动作 (False)
+        # 注意：如果使用ε-贪婪策略随机动作，应该重新调整Ne和C的值
+        self.explore_or_random = True
+
     def train(self):
         self._train = True
 
@@ -74,25 +80,32 @@ class Agent:
 
     def act(self, state, points, dead):
         """
-        选择动作
+        选择动作并更新Q表
         """
         discrete_state = self.discretize_state(state)
 
         if dead:
             return None
 
-        # 更新Q表
-        if self._train and self.last_action is not None:
-            reward = points - self.last_points  # 计算奖励
-            self.update_q_table(self.last_state, self.last_action, reward, discrete_state)
+        if self._train:
+            if self.last_action is not None:
+                reward = points - self.last_points  # 计算奖励
+            else:
+                reward = points
+            # 更新Q表和N表
+            self.update_q_n_table(self.last_state, self.last_action, reward, discrete_state)
 
-        # if self.s is not None:  # 如果不是第一次执行
-        #     future_optimal_value = np.max(self.Q[discrete_state])
-        #     self.Q[self.s][self.a] += 20 * (points + self.gamma * future_optimal_value - self.Q[self.s][self.a])
-
-        # 选择动作
-        if self._train and random.random() < self.epsilon():
-            action = random.choice(self.actions)
+        if self._train:
+            if self.explore_or_random:
+                # 使用探索函数选择动作
+                exploration_values = self.Q[discrete_state] + np.where(self.N[discrete_state] < self.Ne, self.R_plus, 0)
+                action = np.argmax(exploration_values)
+            else:
+                # 使用ε-贪婪策略选择动作
+                if random.random() < self.epsilon():
+                    action = random.choice(self.actions)
+                else:
+                    action = np.argmax(self.Q[discrete_state])
         else:
             action = np.argmax(self.Q[discrete_state])
 
@@ -103,7 +116,7 @@ class Agent:
 
         return action
 
-    def update_q_table(self, state, action, reward, new_state):
+    def update_q_n_table(self, state, action, reward, new_state):
         """
         更新Q表
         :param state: 旧状态
@@ -111,7 +124,11 @@ class Agent:
         :param reward: 获得的奖励
         :param new_state: 新状态
         """
-        learning_rate = 0.1  # 例如：学习率
+        # learning_rate = 0.1  # 例如：学习率
+
+        learning_rate = self.C / (self.C + self.N[state][action])
+
+        self.N[state][action] += 1
 
         future_optimal_value = np.max(self.Q[new_state])
         self.Q[state][action] += learning_rate * (reward + self.gamma * future_optimal_value - self.Q[state][action])
@@ -142,7 +159,7 @@ class Agent:
 
     # 辅助函数的实现
     def get_adjoining_wall_x(self, snake_head_x):
-        # ... 实现蛇头与X轴方向墙壁的关系 ...
+        # 实现蛇头与X轴方向墙壁的关系
         if snake_head_x == 0:  # 墙在蛇头左边相邻位置
             return 1
         elif snake_head_x == 480:  # 墙在蛇头右边相邻位置
@@ -151,7 +168,7 @@ class Agent:
             return 0
 
     def get_adjoining_wall_y(self, snake_head_y):
-        # ... 实现蛇头与Y轴方向墙壁的关系 ...
+        # 实现蛇头与Y轴方向墙壁的关系
         if snake_head_y == 0:  # 墙在蛇头上边相邻位置
             return 1
         elif snake_head_y == 480:  # 墙在蛇头下边相邻位置
@@ -160,7 +177,7 @@ class Agent:
             return 0
 
     def get_food_dir_x(self, snake_head_x, food_x):
-        # ... 实现食物在X轴方向上相对于蛇头的位置 ...
+        # 实现食物在X轴方向上相对于蛇头的位置
         if snake_head_x > food_x:  # 食物在蛇头左边
             return 1
         elif snake_head_x < food_x:  # 食物在蛇头右边
@@ -169,7 +186,7 @@ class Agent:
             return 0
 
     def get_food_dir_y(self, snake_head_y, food_y):
-        # ... 实现食物在Y轴方向上相对于蛇头的位置 ...
+        # 实现食物在Y轴方向上相对于蛇头的位置
         if snake_head_y < food_y:  # 食物在蛇头上边
             return 1
         elif snake_head_y > food_y:  # 食物在蛇头下边
@@ -178,7 +195,7 @@ class Agent:
             return 0
 
     def check_adjoining_body(self, x, y, snake_body):
-        # ... 检查指定位置(x, y)是否有蛇的身体部分 ...
+        # 检查指定位置(x, y)是否有蛇的身体部分
         if (x, y) in snake_body:
             return 1
         else:

@@ -141,7 +141,7 @@ def main():
     parser.add_argument('--model_name', dest="model_name", type=str, default="q_agent.npy",
                         help='name of model to save if training or to load if evaluating - default q_agent')
 
-    parser.add_argument('--train_episodes', dest="train_eps", type=int, default=10000,
+    parser.add_argument('--train_episodes', dest="train_eps", type=int, default=3000,
                         help='number of training episodes - default 10000')
 
     parser.add_argument('--test_episodes', dest="test_eps", type=int, default=1000,
@@ -153,10 +153,10 @@ def main():
     parser.add_argument('--window', dest="window", type=int, default=100,
                         help='number of episodes to keep running stats for during training - default 100')
 
-    parser.add_argument('--Ne', dest="Ne", type=int, default=8,
+    parser.add_argument('--Ne', dest="Ne", type=int, default=20,
                         help='the Ne parameter used in exploration function - default 40')
 
-    parser.add_argument('--C', dest="C", type=int, default=65,
+    parser.add_argument('--C', dest="C", type=int, default=45,
                         help='the C parameter used in learning rate - default 40')
 
     parser.add_argument('--gamma', dest="gamma", type=float, default=0.7,
