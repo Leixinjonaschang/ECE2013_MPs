@@ -44,7 +44,12 @@ class NeuralNet(nn.Module):
         """
         super(NeuralNet, self).__init__()
         self.loss_fn = loss_fn
-        raise NotImplementedError("You need to write this part!")
+        self.lrate = lrate
+        self.in_size = in_size
+        self.out_size = out_size
+        self.model = nn.Sequential(nn.Linear(in_size, 32), nn.ReLU(), nn.Linear(32, out_size))
+        self.optimizer = optim.SGD(self.model.parameters(), lrate)
+        # raise NotImplementedError("You need to write this part!")
 
     # def set_parameters(self, params):
     #     """ Sets the parameters of your network.
@@ -66,8 +71,8 @@ class NeuralNet(nn.Module):
         @param x: an (N, in_size) Tensor
         @return y: an (N, out_size) Tensor of output from the network
         """
-        raise NotImplementedError("You need to write this part!")
-        return torch.ones(x.shape[0], 1)
+        # raise NotImplementedError("You need to write this part!")
+        return self.model.forward(x)
 
     def step(self, x, y):
         """
@@ -77,8 +82,12 @@ class NeuralNet(nn.Module):
         @param y: an (N,) Tensor
         @return L: total empirical risk (mean of losses) at this timestep as a float
         """
-        raise NotImplementedError("You need to write this part!")
-        return 0.0
+        # raise NotImplementedError("You need to write this part!")
+        L = self.loss_fn(self.forward(x),y)
+        self.optimizer.zero_grad()
+        L.backward()
+        self.optimizer.step()
+        return L.item
 
 
 def fit(train_set, train_labels, dev_set, n_iter, batch_size=100):
@@ -97,5 +106,28 @@ def fit(train_set, train_labels, dev_set, n_iter, batch_size=100):
     @return yhats: an (M,) NumPy array of binary labels for dev_set
     @return net: a NeuralNet object
     """
-    raise NotImplementedError("You need to write this part!")
-    return [], [], None
+    # raise NotImplementedError("You need to write this part!")
+    model = NeuralNet(0.01, nn.CrossEntropyLoss(), train_set.size(dim=1), 2)
+
+    #Doing normalization
+    train_normal = (train_set - train_set.mean())/train_set.std()
+    dev_normal = (dev_set - dev_set.mean())/dev_set.std()
+    loss_list = []
+
+    batch = torch.split(train_normal, batch_size)
+    batch1 = torch.split(train_labels, batch_size)
+
+
+    #Create the training loop
+    for i in range(n_iter):
+        loss_step1 = batch[i % len(batch)]
+        loss_step2 = batch1[i % len(batch)]
+        loss = model.step(loss_step1, loss_step2)
+        loss_list.append(loss)
+
+    forward = model.forward(dev_normal)
+    network = forward.detach().numpy()
+
+    yhat = np.argmax(network,axis=1)
+    return loss_list, yhat, model
+    
